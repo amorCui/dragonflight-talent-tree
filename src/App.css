@@ -1,0 +1,50 @@
+.title{
+    color: #fff;
+    margin: 0.25rem;
+}
+.professional{
+    border-bottom: 1px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.professional-item{
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 5%;
+    color: black;
+}
+
+.professional-item.active{
+    box-shadow: 0.5rem 0.5rem 0.25rem grey;
+    color: white;
+}
+
+.GameIcon{
+    position: relative;
+    display: inline-block;
+    max-width: 168px;
+}
+.GameIcon--large {
+    width: 56px;
+}
+.GameIcon--medium{
+    width: 32px;
+}
+.GameIcon:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
+}
+
+.GameIcon-icon{
+    position: absolute;
+    background-size: cover;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
