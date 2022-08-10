@@ -26,6 +26,7 @@ function Talents() {
         if (data.specs.length > 0) {
             specData = data.specs.find((data) => data.name.toLowerCase() === spec)
         }
+        console.log('specData', specData)
 
         renderDomHead = (
             <div>
@@ -62,9 +63,9 @@ function Talents() {
 
         if (spec && specData) {
             // 职业天赋树
-            let telTree = new TalentTree('职业天赋树', data.name, data.nameCh, data.id, getTreeDataById(data.id)).render()
+            let telTree = new TalentTree(specData, '职业天赋树', data.name, data.nameCh, data.id, getTreeDataById(data.id)).render()
             // 专精天赋树
-            let specTree = new TalentTree('专精天赋树', specData.name, specData.nameCh, specData.id, getTreeDataById(specData.id)).render()
+            let specTree = new TalentTree(specData, '专精天赋树', specData.name, specData.nameCh, specData.id, getTreeDataById(specData.id)).render()
 
             renderTrees = (
                 <div
@@ -93,7 +94,8 @@ function Talents() {
 /**
  * 天赋树object
  */
-let TalentTree = function TalentTree(title, name, nameCh, key, data) {
+let TalentTree = function TalentTree(specData, title, name, nameCh, key, data) {
+    this.specData = specData
     this.title = title
     this.name = name
     this.nameCh = nameCh
@@ -119,51 +121,117 @@ let TalentTree = function TalentTree(title, name, nameCh, key, data) {
                     </div>
                 </div>
                 <div className="talent-tree-body">
-                    <div className="talent-tree-space">{this.items}</div>
+                    <div className="talent-tree-space">{this.items()}</div>
                 </div>
             </div>
         )
     }
 
-    this.items = (
-        <div className="talent-tree-grid">
-            {Object.keys(this.data.talents).forEach((idKey) => {
-                let talentSkills = this.data.talents[idKey]
-                if (talentSkills.length === 1) {
-                    let talentSkill = talentSkills[0]
-                    let column = (talentSkill.cell % this.width) + 1
-                    let row = Math.floor(talentSkill.cell / this.width) + 1
-                    console.log('talentSkill', talentSkill)
-                    // 只有一个技能的区域
-                    return (
-                        <a className="talent-tree-talent" data-row={row} data-column={column} data-cell={talentSkill.cell} data-talent-type={talentSkill.type} data-tooltip-mode="icon" data-no-touch-lightbox="true" href="https://www.wowhead.com/beta/spell=1822/rake" data-available="1" key={talentSkill.spells[0].spell}>
-                            <div className="talent-tree-talent-name">Rake</div>
+    this.items = () => {
+        return (
+            <div className="talent-tree-grid">
+                {Object.keys(this.data.talents).map((idKey) => {
+                    let talentSkills = this.data.talents[idKey]
+
+                    return this.item(talentSkills)
+
+                    // else {
+                    //     // 多选技能区域
+                    //     // return (
+                    //     //     <a className="talent-tree-talent" data-row="1" data-column="3" data-cell="2" data-talent-type="1" data-tooltip-mode="icon" data-no-touch-lightbox="true" href="https://www.wowhead.com/beta/spell=1822/rake" data-available="1">
+                    //     //         <div className="dragonflight-talent-tree-talent-name">Test</div>
+                    //     //         <div className="dragonflight-talent-tree-talent-boundary">
+                    //     //             <div className="dragonflight-talent-tree-talent-inner">
+                    //     //                 <div className="dragonflight-talent-tree-talent-inner-background"></div>
+                    //     //             </div>
+                    //     //         </div>
+                    //     //     </a>
+                    //     // )
+                    // }
+                })}
+            </div>
+        )
+    }
+
+    this.item = (talentSkills) => {
+        console.log('talentSkills', talentSkills)
+        // 只有一个技能的区域
+        if (talentSkills.length === 1) {
+            let talentSkill = talentSkills[0]
+            let column = (talentSkill.cell % this.width) + 1
+            let row = Math.floor(talentSkill.cell / this.width) + 1
+            let isDefaultSkill = talentSkill.defaultSpecs[0] === this.specData.id
+
+            if (!isDefaultSkill) {
+                // 非 default skill 可以编辑
+                return (
+                    // data-available="1" 彩色色块
+                    // data-full="1" 金色边框
+                    <div className="talent-tree-talent" data-row={row} data-column={column} data-cell={talentSkill.cell} data-talent-type={talentSkill.type} data-tooltip-mode="icon" data-available={isDefaultSkill ? '1' : '0'} data-full={isDefaultSkill ? '1' : '0'} data-no-touch-lightbox="true" key={talentSkill.spells[0].spell}>
+                        <a href={`https://www.wowhead.com/beta/spell=${talentSkill.spells[0].spell}/${talentSkill.spells[0].name}`}>
+                            <div className="talent-tree-talent-name">{talentSkill.spells[0].name}</div>
                             <div className="talent-tree-talent-boundary">
                                 <div className="talent-tree-talent-inner">
-                                    <div className="talent-tree-talent-inner-background"></div>
+                                    <div
+                                        className="talent-tree-talent-inner-background"
+                                        style={{
+                                            // https://wow.zamimg.com/images/wow/icons/large/xxx.jpg
+                                            backgroundImage: `url('http://www.wowdb.cn/icons/large/${talentSkill.spells[0].icon}.jpg')`,
+                                        }}></div>
                                 </div>
                             </div>
                         </a>
-                    )
-                } else {
-                    return <div></div>
-                }
-                // else {
-                //     // 多选技能区域
-                //     // return (
-                //     //     <a className="talent-tree-talent" data-row="1" data-column="3" data-cell="2" data-talent-type="1" data-tooltip-mode="icon" data-no-touch-lightbox="true" href="https://www.wowhead.com/beta/spell=1822/rake" data-available="1">
-                //     //         <div className="dragonflight-talent-tree-talent-name">Test</div>
-                //     //         <div className="dragonflight-talent-tree-talent-boundary">
-                //     //             <div className="dragonflight-talent-tree-talent-inner">
-                //     //                 <div className="dragonflight-talent-tree-talent-inner-background"></div>
-                //     //             </div>
-                //     //         </div>
-                //     //     </a>
-                //     // )
-                // }
-            })}
-        </div>
-    )
+                        <div className="talent-tree-talent-points" data-row={row} data-column={column} data-cell={talentSkill.cell} data-talent-type={talentSkill.type} dangerouslySetInnerHTML={{ __html: `0/${talentSkill.spells[0].points}` }}></div>
+                    </div>
+                )
+            } else {
+                // default skill    不可以编辑区域
+                return (
+                    // data-available="1" 彩色色块
+                    // data-full="1" 金色边框
+                    <div className="talent-tree-talent" data-row={row} data-column={column} data-cell={talentSkill.cell} data-talent-type={talentSkill.type} data-tooltip-mode="icon" data-available={isDefaultSkill ? '1' : '0'} data-full={isDefaultSkill ? '1' : '0'} data-no-touch-lightbox="true" key={talentSkill.spells[0].spell}>
+                        <a href={`https://www.wowhead.com/beta/spell=${talentSkill.spells[0].spell}/${talentSkill.spells[0].name}`}>
+                            <div className="talent-tree-talent-name">{talentSkill.spells[0].name}</div>
+                            <div className="talent-tree-talent-boundary">
+                                <div className="talent-tree-talent-inner">
+                                    <div
+                                        className="talent-tree-talent-inner-background"
+                                        style={{
+                                            // https://wow.zamimg.com/images/wow/icons/large/xxx.jpg
+                                            backgroundImage: `url('http://www.wowdb.cn/icons/large/${talentSkill.spells[0].icon}.jpg')`,
+                                        }}></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                )
+            }
+        } else {
+            // 多选技能区域
+            let talentSkill = talentSkills[0]
+            let column = (talentSkill.cell % this.width) + 1
+            let row = Math.floor(talentSkill.cell / this.width) + 1
+            let isDefaultSkill = talentSkill.defaultSpecs[0] === this.specData.id
+            return (
+                <div className="talent-tree-talent" data-row={row} data-column={column} data-cell={talentSkill.cell} data-talent-type={talentSkill.type} data-tooltip-mode="icon" data-available={isDefaultSkill ? '1' : '0'} data-full={isDefaultSkill ? '1' : '0'} data-no-touch-lightbox="true" key={talentSkill.spells[0].spell}>
+                    <a href={`https://www.wowhead.com/beta/spell=${talentSkill.spells[0].spell}/${talentSkill.spells[0].name}`}>
+                        <div className="talent-tree-talent-name">{talentSkill.spells[0].name}</div>
+                        <div className="talent-tree-talent-boundary">
+                            <div className="talent-tree-talent-inner">
+                                <div
+                                    className="talent-tree-talent-inner-background"
+                                    style={{
+                                        // https://wow.zamimg.com/images/wow/icons/large/xxx.jpg
+                                        backgroundImage: `url('http://www.wowdb.cn/icons/large/${talentSkill.spells[0].icon}.jpg')`,
+                                    }}></div>
+                            </div>
+                        </div>
+                    </a>
+                    <div className="talent-tree-talent-points" data-row={row} data-column={column} data-cell={talentSkill.cell} data-talent-type={talentSkill.type} dangerouslySetInnerHTML={{ __html: `0/${talentSkill.spells[0].points}` }}></div>
+                </div>
+            )
+        }
+    }
 }
 
 export default Talents

@@ -95,12 +95,13 @@
 .talent-tree-head-name{
     color: #fff;
 }
-.talent-tree-head-point{
-    display: flex;
-}
+.talent-tree-head-point,
 .talent-tree-head-level{
     display: flex;
+    text-shadow: 1px 1px 0 #161734, 0 1px 0 #161734, -1px 1px 0 #161734, -1px 0 0 #161734, -2px 0 #161734, -1px 0 #161734, 0px 0 #161734, 1px 0 0 #161734;
+
 }
+
 .talent-tree-body{
     position: relative;
     user-select: none;
@@ -128,6 +129,58 @@
     margin: 20%;
     position: relative;
     z-index: 20;
+}
+
+.talent-tree-talent-points {
+    /* align-self: end; */
+    background-color: #000;
+    border-radius: 4px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #242424, 0 1px 0 #242424, -1px 1px 0 #242424, -1px 0 0 #242424, -2px 0 #242424, -1px 0 #242424, 0px 0 #242424, 1px 0 0 #242424;
+    /* justify-self: end; */
+    margin: 10%;
+    padding: 0 3px;
+    pointer-events: none;
+    z-index: 20;
+    position: absolute;
+    left: 20px;
+    bottom: -10px;
+}
+
+.talent-tree-talent[data-talent-type="2"], 
+.talent-tree-talent[data-talent-type="2"] .talent-tree-talent-boundary{
+    border-radius: 1000px;
+}
+
+.talent-tree-talent[data-talent-type="3"] {
+    border-width: 0;
+}
+
+.talent-tree-talent-name{
+    display: none;
+}
+
+.talent-tree-talent-boundary,
+.talent-tree-talent-inner,
+.talent-tree-talent-inner-background{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.talent-tree-talent[data-talent-type="3"] .talent-tree-talent-inner {
+    border: 2px solid rgba(64,191,64,0.8);
+    transform: rotate(45deg);
+}
+
+.talent-tree-talent-inner-background{
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 /* tree grid */
@@ -237,4 +290,17 @@
 
 .talent-tree-grid [data-row="10"] {
     grid-row: 10
+}
+
+/* 可点击天赋去除黑白效果 */
+.talent-tree-talent[data-available="1"] {
+    cursor: pointer;
+    filter: none;
+}
+
+.talent-tree-talent[data-full], 
+.talent-tree-talent[data-full][data-talent-type="3"]:before, 
+.talent-tree-talent[data-full][data-talent-type="3"]:after, 
+.talent-tree-talent[data-full][data-talent-type="3"] .talent-tree-talent-inner {
+    border-color: rgba(255,209,0,0.8);
 }
